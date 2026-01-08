@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="images/logo_causalyn.png" alt="Causalyn Logo" width="180"/>
+  <img src="images/logo_causalyn.png" alt="Causalyn Logo" width="300"/>
 </p>
 
 # 🎯 Causalyn — Precision Account Targeting with Causal Uplift  
