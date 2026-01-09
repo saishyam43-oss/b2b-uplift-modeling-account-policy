@@ -198,7 +198,20 @@ ax.plot(target_df["percent_accounts"], target_df["cumulative_value"],
 ax.plot([0, 100], [0, target_df["cumulative_value"].max()],
         color=COLOR_MUTED_1, linestyle='--', linewidth=1.1, alpha=0.6)
 
-ax.set_title('40% of Accounts Capture ~80% of Total Value', pad=40)
+# 1. Calculate Total Value
+max_val = target_df["cumulative_value"].max()
+
+# 2. Find the index where we cross the 80% value threshold
+threshold_val = max_val * 0.80
+p80_idx = target_df[target_df["cumulative_value"] >= threshold_val].index[0]
+
+# 3. Get the specific X and Y coordinates for that index
+p80_val = target_df.iloc[p80_idx]["cumulative_value"]
+p80_pct = target_df.iloc[p80_idx]["percent_accounts"]
+
+# 4. Dynamic Title based on the calculated percentage
+ax.set_title(f"Top ~{int(p80_pct)}% of Targeted Accounts Capture 80% of Total Value", pad=40)
+
 # User's specific placement code
 ax.text(0, 1.05, "Model-driven targeting concentrates value early",
         transform=ax.transAxes, fontsize=11, color='#555555', va='bottom')
@@ -213,23 +226,24 @@ ax.spines['bottom'].set_visible(False)
 from matplotlib.ticker import MaxNLocator
 ax.yaxis.set_major_locator(MaxNLocator(nbins=3))
 
-p40_idx = int(len(target_df) * 0.40)
-p40_val = target_df.iloc[p40_idx]["cumulative_value"]
-p40_pct = target_df.iloc[p40_idx]["percent_accounts"]
-max_val = target_df["cumulative_value"].max()
-
-ax.scatter([p40_pct], [p40_val], color='#333333', s=40, zorder=5)
+# Plot the dot at the 80% value mark
+ax.scatter([p80_pct], [p80_val], color='#333333', s=40, zorder=5)
 
 # User's specific placement code for callout
-label_y_pos = p40_val - (max_val * 0.06)
+label_y_pos = p80_val - (max_val * 0.05) # Slightly lower to avoid overlapping the line
 
-ax.text(p40_pct+2, label_y_pos, f"80% Value",
-        fontsize=11, fontweight='bold', va='top')
+ax.text(
+    p80_pct + 3, # Offset X slightly to the right
+    label_y_pos,
+    "80% of Value", # Fixed text since we forced the location
+    fontsize=11,
+    fontweight='bold',
+    va='top'
+)
 
 # Connector line
-ax.plot([p40_pct, p40_pct], [p40_val, label_y_pos + (max_val * 0.04)],
+ax.plot([p80_pct, p80_pct], [p80_val, label_y_pos + (max_val * 0.04)],
         color='#333333', linestyle=':', linewidth=1)
-
 plt.tight_layout()
 plt.savefig(IMG_DIR / "03_budget_efficiency.png", dpi=300)
 print(f"Saved: {IMG_DIR / '03_budget_efficiency.png'}")
@@ -344,3 +358,4 @@ if HAS_TRUTH:
         f.write(f"CRITICAL FAILURE COUNT: {len(failures)}")
 
 print("\nVisualization Phase Complete.")
+
