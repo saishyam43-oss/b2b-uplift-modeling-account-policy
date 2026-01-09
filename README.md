@@ -16,7 +16,7 @@
 
 **Key Outcomes:**
 - **Safety:** I avoided **100%** of high-risk "Sleeping Dog" accounts (0.00% error rate).
-- **Efficiency:** The policy captures **~80% of the achievable safe value** using **~61% of the targeting budget**.
+- **Efficiency:** The policy captures **~80% of the precision-policy value** using **~61% of the targeting budget**.
 - **Decision:** ➡️ ➡️ **Ship the Precision Policy.** While it captures less total revenue than a blind nudge (~$32k vs $56k, **~57%** of unconstrained upside), it reduces the **Admin Churn Risk to near-zero**.
 
 ***Note**: The zero-error result holds against the simulated ground truth and demonstrates policy correctness, not a claim of perfect real-world performance.*
@@ -63,7 +63,7 @@ My analysis proved that while "Blind Nudging" (targeting everyone) maximizes the
 I identified that value is highly concentrated. By ranking accounts by **Net Expected Value**, we can capture **80% of the total upside** by targeting the top **~61%** of accounts, beyond which returns diminish sharply.
 
 ![Budget Efficiency](images/03_budget_efficiency.png)
-* **Pareto Efficiency:** The curve shows strong value concentration early. Approximately **61% of targeted accounts capture 80% of total value**, while the remaining accounts contribute progressively smaller incremental gains.
+* **Pareto Efficiency:** The curve shows strong value concentration early. Approximately **61% of targeted accounts capture 80% of precision-policy value**, while the remaining accounts contribute progressively smaller incremental gains.
 * **Model vs. Random:** The significant gap between the **Green Curve (Model)** and the **Dashed Line (Random)** proves the model successfully ranks customers by causal impact, rather than just picking lucky winners.
 * **Budget Optimization:** We can cut the campaign budget by **39%** (stopping at the dot) while retaining **80%** of the program's value.
 
@@ -95,7 +95,7 @@ I audited the policy against a hidden ground-truth dataset. The results confirme
 2.  **The Admin Multiplier:** B2B retention is hierarchical, not democratic. Accounts with >2 Admins had a **3x sensitivity** to negative interventions. Aggregating user scores to the account level reversed the decision for **~15% of accounts**.
 3.  **The "Momentum" Signal:** Users showing a **deceleration** in activity (dropping 10-20% WoW) were **2x more persuadable** than stable high-activity users. The model identified "at-risk" engagement as a key opportunity signal.
 4.  **The ROI Cliff:** **15%** of positive-lift accounts were actually **ROI Negative** because the expected incremental revenue (~$5) didn't cover the intervention cost ($7). Pure lift optimization would have bled budget here.
-5.  **Pareto Efficiency:** The cumulative value curve flattens significantly after the top 40%. We can capture **80% of the total value** with only **40% of the budget**. Targeting beyond this point yields diminishing returns.
+5.  **Pareto Efficiency:** We can capture 80% of value by targeting ~61% of accounts, after which returns diminish sharply.
 6.  **The "Neutrality Gap":** Raw data showed the Treated group performed *worse* than Control (-0.04 lift) due to historical selection bias (targeting annoyed users). Using a **Calibrated T-Learner** was the only way to correct this confounding and reveal true lift.
 7.  **Guardrails > Thresholds:** Probabilistic models make mistakes. Explicit business rules (e.g., "No Toxic Admins") proved more reliable than probability thresholds alone, reducing the false positive rate on "Sleeping Dogs" from **12%** (raw model) to **0%** (policy).
 
