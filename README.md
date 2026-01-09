@@ -4,7 +4,7 @@
 
 <h1 align="center">Causalyn — Precision Account Targeting with Causal Uplift</h1>  
 
-> *Preventing Admin Churn While Capturing 80% of Value from 40% of Accounts*
+> *Preventing Admin Churn While Capturing 80% of Value from 61% of Accounts*
 
 ---
 
@@ -16,8 +16,8 @@
 
 **Key Outcomes:**
 - **Safety:** I avoided **100%** of high-risk "Sleeping Dog" accounts (0.00% error rate).
-- **Efficiency:** The policy captures **~80% of the achievable safe value** using only **40% of the budget**.
-- **Decision:** ➡️ ➡️ **Ship the Precision Policy.** While it captures less total revenue than a blind nudge (~$32k vs $56k), it reduces the **Admin Churn Risk to near-zero**.
+- **Efficiency:** The policy captures **~80% of the achievable safe value** using **~61% of the targeting budget**.
+- **Decision:** ➡️ ➡️ **Ship the Precision Policy.** While it captures less total revenue than a blind nudge (~$32k vs $56k, **~57%** of unconstrained upside), it reduces the **Admin Churn Risk to near-zero**.
 
 ***Note**: The zero-error result holds against the simulated ground truth and demonstrates policy correctness, not a claim of perfect real-world performance.*
 
@@ -59,16 +59,13 @@ My analysis proved that while "Blind Nudging" (targeting everyone) maximizes the
 * **Strategic Choice:** The policy optimizes for **"Safe Revenue"**—capturing the majority of the upside while completely immunizing the business against the catastrophic downside of Admin churn.
 * **Efficiency:** The Precision policy captures **57% of the total potential value** while incurring **0% of the Admin risk**.
 
-***Note**: The 80% figure refers to value concentration within the eligible population after safety filters, while 57% is relative to an unconstrained blind-nudge baseline.*
-
 ### 3. The Efficiency: "Diminishing Returns"
-I identified that value is highly concentrated. By ranking accounts by **Net Expected Value**, we can capture **80% of the total upside** by targeting just the top **40%** of accounts.
+I identified that value is highly concentrated. By ranking accounts by **Net Expected Value**, we can capture **80% of the total upside** by targeting the top **~61%** of accounts, beyond which returns diminish sharply.
 
 ![Budget Efficiency](images/03_budget_efficiency.png)
-* **Pareto Efficiency:** The curve demonstrates that value is heavily front-loaded. The top 40% of accounts provide exponential returns, while the "Long Tail" (bottom 60%) offers marginal utility.
+* **Pareto Efficiency:** The curve shows strong value concentration early. Approximately **61% of targeted accounts capture 80% of total value**, while the remaining accounts contribute progressively smaller incremental gains.
 * **Model vs. Random:** The significant gap between the **Green Curve (Model)** and the **Dashed Line (Random)** proves the model successfully ranks customers by causal impact, rather than just picking lucky winners.
-* **Budget Optimization:** We can cut the campaign budget by **60%** (stopping at the dot) while retaining **80%** of the program's value.
-* **The "Neutral" Zone:** The flat trajectory of the curve beyond the 60% mark indicates that further spending yields **zero incremental value**, validating the decision to stop targeting early.
+* **Budget Optimization:** We can cut the campaign budget by **39%** (stopping at the dot) while retaining **80%** of the program's value.
 
 ### 4. The Validation: "Signal Separation"
 I validated that the model successfully distinguishes between helpful and harmful interventions. Targeted accounts (Green) show a strong positive uplift distribution, while suppressed accounts (Red) cluster around zero or negative lift.
