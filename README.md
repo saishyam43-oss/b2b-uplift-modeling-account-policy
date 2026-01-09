@@ -109,14 +109,42 @@ I audited the policy against a hidden ground-truth dataset. The results confirme
 
 ---
 
-## 🔍 The Challenge: Overcoming Selection Bias
+## 🔬 Technical Methodology
 
-The raw data contained a critical trap: **Selection Bias.**
-Historically, CSMs targeted "Active Users" more often. However, these users were often "Sleeping Dogs" (annoyed by interruptions).
+### 1. Data Engineering: Simulating Behavioral Archetypes
+Since real causal ground truth is impossible to observe (we can't both treat and ignore the same person), I generated synthetic data based on real-world B2B behavioral patterns. The **Latent Uplift Groups** were assigned based on explicit logic:
 
-* **The Neutrality Gap:** This created a bias where the Treated group appeared to have a **lower average conversion** (-0.04 lift) than Control.
-* **The Fix:** I implemented a **Calibrated T-Learner** (Two-Model approach).
-* **The Result:** By calibrating the probabilities, I isolated the *incremental* effect of the intervention, separating "likely to buy" (Correlation) from "likely to be persuaded" (Causality).
+* **Sleeping Dogs (High Risk):** Modeled as **High-Intensity Users** (>90th percentile activity).
+    * *Logic:* Power users have established workflows. Nudges interrupt them, causing negative lift (annoyance).
+* **Persuadables (The Target):** Modeled as users with **Low Momentum** (Decelerating activity).
+    * *Logic:* Users whose activity has dropped 10-20% WoW are "drifting." A nudge effectively reminds them of value.
+* **Sure Things:** Modeled as **Admins** regarding positive features.
+    * *Logic:* Admins are intrinsically motivated to use the platform; they don't need a nudge to convert.
+* **Lost Causes:** Modeled as **Low-Activity / Stagnant Users**.
+    * *Logic:* Users with near-zero engagement history. A simple nudge is insufficient to resurrect them, resulting in zero lift.
+
+### 2. Feature Engineering: Capturing Intent
+Standard "count" features were insufficient. I engineered second-order derivatives to detect trajectory and intent:
+
+* **Momentum ($\Delta$ Velocity):**
+    * `Momentum = (Activity_Last_7_Days) / (Activity_Last_30_Days / 4)`
+    * *Insight:* A value `< 1.0` indicates deceleration. My model found this was the **#1 predictor of persuadability**.
+* **Intensity (Workflow Density):**
+    * `Intensity = (Actions) / (Session_Duration)`
+    * *Insight:* High intensity correlated with "Sleeping Dog" behavior (users working fast do not want interruptions).
+* **Baseline Context:**
+    * Included standard B2B covariates: `User_Role` (Admin vs. User), `Account_Size`, `Tenure_Days`, and `Prev_Nudge_Response`.
+
+### 3. Model Selection: Why T-Learner?
+I rejected standard approaches in favor of Causal Inference to avoid the "Active User Trap."
+
+| Approach | The Question it Answers | Why I Rejected It |
+| :--- | :--- | :--- |
+| **Propensity Model** | "Who is likely to buy?" | Targets **Sure Things** (waste) and **High-Activity Sleeping Dogs** (risk). |
+| **Churn Model** | "Who is likely to leave?" | Doesn't tell me if a nudge will *stop* them. It might push them out faster. |
+| **T-Learner (My Choice)** | "What is the **difference** if I nudge vs. don't?" | Explicitly calculates the treatment effect: $\tau(x) = E[Y \| T=1] - E[Y \| T=0]$. |
+
+* **Selection Bias Correction:** The raw data showed the Treated group performed *worse* than Control (The "Neutrality Gap"). A standard model would have learned that "Nudges = Bad." By using a **Calibrated T-Learner**, I separated the *baseline* user sentiment from the *treatment effect*, correcting this bias.
 
 ---
 
@@ -128,7 +156,7 @@ Prediction is not a decision. I engineered a policy layer to translate scores in
 | :--- | :--- | :--- |
 | **Toxic Admin Protocol** | Admins control the contract. | If *any* Admin has negative predicted lift, suppress the *entire* account. |
 | **Toxic User Threshold** | Users talk to each other. | Suppress accounts where >10% of users are predicted to react negatively. |
-| **Profitability Constraint** | Support costs are real. | Suppress accounts where `(Exp. Revenue - Cost) <= 0`. |
+| **Economic Viability** | Support costs are real. | Suppress accounts where `Expected_Revenue < Intervention_Cost` (e.g., small accounts where even a win is unprofitable). |
 
 ---
 
