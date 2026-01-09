@@ -16,8 +16,10 @@
 
 **Key Outcomes:**
 - **Safety:** I avoided **100%** of high-risk "Sleeping Dog" accounts (0.00% error rate).
-- **Efficiency:** I captured **~80% of total upside** by targeting just the top **40%** of accounts.
-- **Decision:** ➡️ **Ship the Precision Policy.** I rejected the blanket nudge approach to protect long-term retention.
+- **Efficiency:** The policy captures **~80% of the achievable safe value** using only **40% of the budget**.
+- **Decision:** ➡️ ➡️ **Ship the Precision Policy.** While it captures less total revenue than a blind nudge (~$32k vs $56k), it reduces the **Admin Churn Risk to near-zero**.
+
+***Note**: The zero-error result holds against the simulated ground truth and demonstrates policy correctness, not a claim of perfect real-world performance.*
 
 ---
 
@@ -57,6 +59,8 @@ My analysis proved that while "Blind Nudging" (targeting everyone) maximizes the
 * **Strategic Choice:** The policy optimizes for **"Safe Revenue"**—capturing the majority of the upside while completely immunizing the business against the catastrophic downside of Admin churn.
 * **Efficiency:** The Precision policy captures **57% of the total potential value** while incurring **0% of the Admin risk**.
 
+***Note**: The 80% figure refers to value concentration within the eligible population after safety filters, while 57% is relative to an unconstrained blind-nudge baseline.*
+
 ### 3. The Efficiency: "Diminishing Returns"
 I identified that value is highly concentrated. By ranking accounts by **Net Expected Value**, we can capture **80% of the total upside** by targeting just the top **40%** of accounts.
 
@@ -81,7 +85,7 @@ I audited the policy against a hidden ground-truth dataset. The results confirme
 ![Safety Audit](images/05_failure_matrix.png)
 * **Safety (0% Error):** **No Sleeping Dogs were targeted.** The policy achieved its primary goal of being "Safe by Design."
 * **Cost Savings (75.2% Suppressed):** Look at the **"Sure Thing"** column. The policy suppressed **75.2%** of customers who would have converted *without* the nudge.
-    * *Insight:* This proves the model is not just optimizing for conversion (which would target Sure Things), but for **Lift** (incremental impact), saving budget on free-riders.
+    * *Insight:* This proves the model is consistent with **Lift** (incremental impact) optimization behavior, saving budget on free-riders.
 * **Conservative Bias:** The policy targeted only **45.9%** of the "Persuadables."
     * *Insight:* The system accepts missing some opportunities (False Negatives) to ensure it never causes harm (False Positives).
 * **Lost Cause Filtering:** **59.4%** of "Lost Causes" were correctly suppressed, preventing wasted effort on customers who are resistant to intervention.
@@ -157,6 +161,19 @@ Prediction is not a decision. I engineered a policy layer to translate scores in
 | **1. Toxic Admin Protocol** | **Safety (Contract Risk):** Admins control renewals. A single annoyed Admin outweighs 10 happy users. | **Strict Veto:** If *any* Admin in an account has negative predicted lift, suppress the *entire* account (281 accounts). |
 | **2. Toxic User Threshold** | **Health (Workflow Friction):** If many users react negatively, it indicates systemic product friction, not a marketing opportunity. | **Density Check:** Suppress any account where **>10% of users** are predicted to be "Sleeping Dogs" (937 accounts). |
 | **3. Economic Viability** | **ROI (Unit Economics):** Even if lift is positive, it must be large enough to cover the cost of the intervention ($7). | **Profit Gate:** Suppress accounts where `(Exp. Revenue - Cost) <= 0`. This filters out "Sure Things" and small accounts (220 accounts). |
+
+---
+
+## 🚀 Operationalizing in Production
+
+To implement this policy in a real-world B2B environment, I would establish the following governance:
+
+* **Ownership:** The **Growth Product Manager** owns the target list; **Data Science** owns the policy logic.
+* **Success Metric (KPI):**
+    * *Primary:* Incremental Revenue per Treated Account (Lift).
+    * *Guardrail:* Admin Churn Rate in the treated cohort vs. control.
+* **Rollback Condition:** If the **Negative Reaction Rate** (e.g., unsubscribes, support tickets) exceeds 5% in the first decile rollout, pause the campaign immediately.
+* **Holdout Strategy:** Maintain a **10% Global Control Group** to continuously validate the model's lift assumptions over time.
 
 ---
 
