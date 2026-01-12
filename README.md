@@ -161,7 +161,7 @@ Prediction is not a decision. I engineered a policy layer to translate scores in
 
 ---
 
-## 🚀 Operationalizing in Production
+## 🚀 Deployment & Governance Strategy
 
 To implement this policy in a real-world B2B environment, I would establish the following governance:
 
@@ -255,7 +255,7 @@ These constraints are intentional to keep the project focused on **decision desi
 
 ---
 
-## 🔮 What I’d Do Next in Production
+## 🔮 Future Roadmap & Iteration
 
 1.  **LTV-Weighted Uplift:** Optimize for Lifetime Value rather than one-time activation.
 2.  **Online Policy Learning:** Implement a Contextual Bandit to adapt the policy in real-time.
