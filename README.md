@@ -154,7 +154,7 @@ Every suppression rule exists to eliminate one of these failure modes.
 
 ---
 
-## 🔬 ## 🔬 Technical Methodology (In Service of Decision Safety)
+## 🔬 Technical Methodology (In Service of Decision Safety)
 
 ### 1. Data Engineering: Simulating Behavioral Archetypes
 Since real causal ground truth is impossible to observe (we can't both treat and ignore the same person), I generated synthetic data based on real-world B2B behavioral patterns. The **Latent Uplift Groups** were assigned based on explicit logic:
